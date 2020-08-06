@@ -76,7 +76,7 @@ class MatPlotLibPrinter(Printer):
     def print(self, b):
         b_ = [[float(j) if j.isdigit() else 0 for j in i] for i in b]
         self.h.set_data(b_)
-        plt.pause(10**-5)
+        plt.pause(10**-10)
         plt.draw()
 
 
