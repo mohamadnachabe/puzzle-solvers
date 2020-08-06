@@ -2,6 +2,10 @@ class SudokuSolver:
     def __init__(self, printer, board) -> None:
         self.printer = printer
         self.board = board
+        self.stack_used = 0
+        # minimum stack required
+        # import sys
+        # sys.setrecursionlimit(57)
 
     def solve(self) -> bool:
         def helper(board):
@@ -12,12 +16,14 @@ class SudokuSolver:
 
                         for c in candidates:
                             board[row][col] = c
-                            self.printer.print(board)
+                            self.printer.print(board, opt={'stack_used': self.stack_used})
+                            self.stack_used += 1
                             if helper(board):
                                 return True
 
                             board[row][col] = '.'
-                            self.printer.print(board)
+                            self.stack_used -= 1
+                            self.printer.print(board, opt={'stack_used': self.stack_used})
 
                         return False
             return True
@@ -58,8 +64,8 @@ class SudokuSolver:
 
 
 class Printer:
-    def print(self, b):
-        raise NotImplemented
+    def print(self, b, opt=None):
+        pass
 
 
 import matplotlib.pyplot as plt
@@ -70,18 +76,31 @@ class MatPlotLibPrinter(Printer):
     def __init__(self, initial_state) -> None:
         b_ = [[float(j) if j.isdigit() else 0 for j in i] for i in initial_state]
         self.h = plt.imshow(b_, cmap="hot_r")
+        self.t = plt.text(x=0.1, y=0.05, s='', transform=plt.gcf().transFigure)
         plt.colorbar()
         plt.axis(False)
 
-    def print(self, b):
+    def print(self, b, opt=None):
+        text = []
+
+        if opt and 'recursive_calls' in opt:
+            recursive_calls = opt['recursive_calls']
+            text.append('recursive_calls={0}'.format(recursive_calls))
+
+        if opt and 'stack_used' in opt:
+            stack_used = opt['stack_used']
+            text.append('stack_used={0}'.format(stack_used))
+
         b_ = [[float(j) if j.isdigit() else 0 for j in i] for i in b]
+
         self.h.set_data(b_)
-        plt.pause(10**-10)
+        self.t.set_text('\n'.join(text))
+        plt.pause(10 ** -4)
         plt.draw()
 
 
 class StdoutPrinter(Printer):
-    def print(self, b):
+    def print(self, b, opt=None):
         for i in b:
             print(i)
         print(str.join('', ['-' for _ in range(50)]))
