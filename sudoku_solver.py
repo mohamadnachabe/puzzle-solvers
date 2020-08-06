@@ -20,9 +20,9 @@ class SudokuSolver:
                             board[row][col] = c
                             self.stats['attempts'] += 1
                             self.printer.print(board, stats=self.stats)
-                            self.stats['stack_used'] += 1
+                            self.stats['stack_in_use'] += 1
                             self.stats['max_stack_used'] = \
-                                max(self.stats['max_stack_used'], self.stats['stack_used'])
+                                max(self.stats['max_stack_used'], self.stats['stack_in_use'])
                             if helper(board):
                                 if stop_at_first_solution:
                                     return True
@@ -31,9 +31,9 @@ class SudokuSolver:
                             board[row][col] = '.'
                             self.printer.print(board, stats=self.stats)
 
-                        self.stats['stack_used'] -= 1
+                        self.stats['stack_in_use'] -= 1
                         return False
-            self.stats['stack_used'] -= 1
+            self.stats['stack_in_use'] -= 1
             return True
 
         return helper(self.board)
@@ -84,7 +84,8 @@ class MatPlotLibPrinter(Printer):
     def __init__(self, initial_state) -> None:
         b_ = [[float(j) if j.isdigit() else 0 for j in i] for i in initial_state]
 
-        self.h = plt.imshow(b_, cmap="hot_r", aspect='auto')
+        plt.subplots(figsize=(5, 6))
+        self.h = plt.imshow(b_, cmap="hot_r")
         self.t = plt.text(x=0.01, y=0.01, s='', transform=plt.gcf().transFigure)
         plt.colorbar()
         plt.axis(False)
@@ -128,4 +129,4 @@ if __name__ == '__main__':
 
     b = SudokuSolver(printer_matplotlib, board_to_solve).solve(stop_at_first_solution=False)
     print(b)
-    plt.show(figsize=(18, 20))
+    plt.show()
