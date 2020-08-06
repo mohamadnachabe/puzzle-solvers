@@ -1,8 +1,9 @@
 class SudokuSolver:
     def __init__(self, printer, board) -> None:
+        from collections import defaultdict
         self.printer = printer
         self.board = board
-        self.stack_used = 0
+        self.stats = defaultdict(int)
         # minimum stack required
         # import sys
         # sys.setrecursionlimit(57)
@@ -16,14 +17,15 @@ class SudokuSolver:
 
                         for c in candidates:
                             board[row][col] = c
-                            self.printer.print(board, opt={'stack_used': self.stack_used})
-                            self.stack_used += 1
+                            self.stats['attempts'] += 1
+                            self.printer.print(board, stats=self.stats)
+                            self.stats['stack_used'] += 1
                             if helper(board):
                                 return True
 
                             board[row][col] = '.'
-                            self.stack_used -= 1
-                            self.printer.print(board, opt={'stack_used': self.stack_used})
+                            self.stats['stack_used'] -= 1
+                            self.printer.print(board, stats=self.stats)
 
                         return False
             return True
@@ -64,7 +66,7 @@ class SudokuSolver:
 
 
 class Printer:
-    def print(self, b, opt=None):
+    def print(self, b, stats=None):
         pass
 
 
@@ -80,16 +82,12 @@ class MatPlotLibPrinter(Printer):
         plt.colorbar()
         plt.axis(False)
 
-    def print(self, b, opt=None):
+    def print(self, b, stats=None):
         text = []
-
-        if opt and 'recursive_calls' in opt:
-            recursive_calls = opt['recursive_calls']
-            text.append('recursive_calls={0}'.format(recursive_calls))
-
-        if opt and 'stack_used' in opt:
-            stack_used = opt['stack_used']
-            text.append('stack_used={0}'.format(stack_used))
+        if stats:
+            for k in stats.keys():
+                v = stats[k]
+                text.append('{0}={1}'.format(k, v))
 
         b_ = [[float(j) if j.isdigit() else 0 for j in i] for i in b]
 
@@ -100,7 +98,7 @@ class MatPlotLibPrinter(Printer):
 
 
 class StdoutPrinter(Printer):
-    def print(self, b, opt=None):
+    def print(self, b, stats=None):
         for i in b:
             print(i)
         print(str.join('', ['-' for _ in range(50)]))
