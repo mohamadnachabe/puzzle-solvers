@@ -8,7 +8,8 @@ class SudokuSolver:
         # import sys
         # sys.setrecursionlimit(57)
 
-    def solve(self) -> bool:
+    def solve(self, stop_at_first_solution=True) -> bool:
+
         def helper(board):
             for row in range(len(board)):
                 for col in range(len(board[0])):
@@ -20,14 +21,19 @@ class SudokuSolver:
                             self.stats['attempts'] += 1
                             self.printer.print(board, stats=self.stats)
                             self.stats['stack_used'] += 1
+                            self.stats['max_stack_used'] = \
+                                max(self.stats['max_stack_used'], self.stats['stack_used'])
                             if helper(board):
-                                return True
+                                if stop_at_first_solution:
+                                    return True
+                                self.stats['solutions'] += 1
 
                             board[row][col] = '.'
-                            self.stats['stack_used'] -= 1
                             self.printer.print(board, stats=self.stats)
 
+                        self.stats['stack_used'] -= 1
                         return False
+            self.stats['stack_used'] -= 1
             return True
 
         return helper(self.board)
@@ -77,8 +83,9 @@ class MatPlotLibPrinter(Printer):
 
     def __init__(self, initial_state) -> None:
         b_ = [[float(j) if j.isdigit() else 0 for j in i] for i in initial_state]
-        self.h = plt.imshow(b_, cmap="hot_r")
-        self.t = plt.text(x=0.1, y=0.05, s='', transform=plt.gcf().transFigure)
+
+        self.h = plt.imshow(b_, cmap="hot_r", aspect='auto')
+        self.t = plt.text(x=0.01, y=0.01, s='', transform=plt.gcf().transFigure)
         plt.colorbar()
         plt.axis(False)
 
@@ -119,6 +126,6 @@ if __name__ == '__main__':
     printer_matplotlib = MatPlotLibPrinter(board_to_solve)
     printer_stdout = StdoutPrinter()
 
-    b = SudokuSolver(printer_matplotlib, board_to_solve).solve()
+    b = SudokuSolver(printer_matplotlib, board_to_solve).solve(stop_at_first_solution=False)
     print(b)
-    plt.show()
+    plt.show(figsize=(18, 20))
