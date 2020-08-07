@@ -1,2 +1,2 @@
 # sudoku-solver-visualizer
-![](visual.gif)
+![](visual_1.gif)
