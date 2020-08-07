@@ -19,11 +19,17 @@ class SudokuSolver:
                         for c in candidates:
                             board[row][col] = c
                             self.stats['attempts'] += 1
+
                             self.printer.print(board, stats=self.stats)
+
                             self.stats['stack_in_use'] += 1
                             self.stats['max_stack_used'] = \
                                 max(self.stats['max_stack_used'], self.stats['stack_in_use'])
-                            if helper(board):
+
+                            r = helper(board)
+
+                            self.stats['stack_in_use'] -= 1
+                            if r:
                                 if stop_at_first_solution:
                                     return True
                                 self.stats['solutions'] += 1
@@ -31,12 +37,12 @@ class SudokuSolver:
                             board[row][col] = '.'
                             self.printer.print(board, stats=self.stats)
 
-                        self.stats['stack_in_use'] -= 1
                         return False
-            self.stats['stack_in_use'] -= 1
             return True
 
-        return helper(self.board)
+        r = helper(self.board)
+        self.printer.print(self.board, stats=self.stats)
+        return r
 
     def find_candidates(self, row, col):
         board = self.board
@@ -102,6 +108,7 @@ class MatPlotLibPrinter(Printer):
         self.h.set_data(b_)
         self.t.set_text('\n'.join(text))
         plt.pause(10 ** -4)
+        # plt.pause(0.1)
         plt.draw()
 
 
@@ -127,6 +134,6 @@ if __name__ == '__main__':
     printer_matplotlib = MatPlotLibPrinter(board_to_solve)
     printer_stdout = StdoutPrinter()
 
-    b = SudokuSolver(printer_matplotlib, board_to_solve).solve(stop_at_first_solution=False)
+    b = SudokuSolver(printer_matplotlib, board_to_solve).solve(stop_at_first_solution=True)
     print(b)
     plt.show()
