@@ -1,12 +1,12 @@
+import matplotlib.pyplot as plt
+
+
 class SudokuSolver:
     def __init__(self, printer, board) -> None:
         from collections import defaultdict
         self.printer = printer
         self.board = board
         self.stats = defaultdict(int)
-        # minimum stack required
-        # import sys
-        # sys.setrecursionlimit(57)
 
     def solve(self, stop_at_first_solution=True) -> bool:
 
@@ -77,12 +77,21 @@ class SudokuSolver:
         return candidates
 
 
+class PrinterFactory:
+    matplotlib = 'matplotlib'
+    stdout = 'stdout'
+
+    @staticmethod
+    def get_instance(impl, b):
+        if impl == PrinterFactory.matplotlib:
+            return MatPlotLibPrinter(b)
+        elif impl == PrinterFactory.stdout:
+            return StdoutPrinter()
+
+
 class Printer:
     def print(self, b, stats=None):
         pass
-
-
-import matplotlib.pyplot as plt
 
 
 class MatPlotLibPrinter(Printer):
@@ -108,7 +117,6 @@ class MatPlotLibPrinter(Printer):
         self.h.set_data(b_)
         self.t.set_text('\n'.join(text))
         plt.pause(10 ** -4)
-        # plt.pause(0.1)
         plt.draw()
 
 
@@ -131,9 +139,9 @@ if __name__ == '__main__':
         [".", ".", ".", "4", "1", "9", ".", ".", "5"],
         [".", ".", ".", ".", "8", ".", ".", "7", "9"]]
 
-    printer_matplotlib = MatPlotLibPrinter(board_to_solve)
-    printer_stdout = StdoutPrinter()
+    printer_ = PrinterFactory.get_instance(PrinterFactory.matplotlib, b=board_to_solve)
 
-    b = SudokuSolver(printer_matplotlib, board_to_solve).solve(stop_at_first_solution=True)
+    b = SudokuSolver(printer_, board_to_solve).solve(stop_at_first_solution=True)
     print(b)
+
     plt.show()
