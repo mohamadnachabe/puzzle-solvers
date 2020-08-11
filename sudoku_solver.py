@@ -1,3 +1,7 @@
+from tkinter import *
+from tkinter import ttk
+import time
+
 import matplotlib.pyplot as plt
 
 
@@ -9,8 +13,8 @@ class SudokuSolver:
         self.stats = defaultdict(int)
 
     def solve(self, stop_at_first_solution=True) -> bool:
-
         def helper(board):
+            print('Working')
             for row in range(len(board)):
                 for col in range(len(board[0])):
                     if board[row][col] == '.':
@@ -80,6 +84,7 @@ class SudokuSolver:
 class PrinterFactory:
     matplotlib = 'matplotlib'
     stdout = 'stdout'
+    tkinter = 'tkinter'
 
     @staticmethod
     def get_instance(impl, b):
@@ -87,6 +92,8 @@ class PrinterFactory:
             return MatPlotLibPrinter(b)
         elif impl == PrinterFactory.stdout:
             return StdoutPrinter()
+        elif impl == PrinterFactory.tkinter:
+            return TkinterPrinter(b)
 
 
 class Printer:
@@ -127,6 +134,41 @@ class StdoutPrinter(Printer):
         print(str.join('', ['-' for _ in range(50)]))
 
 
+class TkinterPrinter(Printer):
+
+    def __init__(self, board) -> None:
+        self.board = board
+
+        self.root = Tk()
+        self.root.title("Sudoku solver")
+
+        self.mainframe = ttk.Frame(self.root, padding="3 3 12 12")
+        self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+
+        self.ts = [[StringVar() for _ in _] for _ in board_to_solve]
+        self.hs = [[ttk.Label() for _ in _] for _ in board_to_solve]
+
+        for i in range(len(board_to_solve)):
+            for j in range(len(board_to_solve[0])):
+                self.ts[i][j].set(board_to_solve[i][j])
+                self.hs[i][j] = ttk.Label(self.mainframe, textvariable=self.ts[i][j])
+                self.hs[i][j].grid(column=j, row=i)
+
+        for child in self.mainframe.winfo_children():
+            child.grid_configure(padx=5, pady=5)
+
+    def get_root(self):
+        return self.root
+
+    def print(self, b, stats=None):
+        for i in range(len(b)):
+            for j in range(len(b[0])):
+                self.ts[i][j].set(b[i][j])
+        self.mainframe.update()
+
+
 if __name__ == '__main__':
     board_to_solve = [
         ["5", "3", ".", ".", "7", ".", ".", ".", "."],
@@ -139,9 +181,14 @@ if __name__ == '__main__':
         [".", ".", ".", "4", "1", "9", ".", ".", "5"],
         [".", ".", ".", ".", "8", ".", ".", "7", "9"]]
 
-    printer_ = PrinterFactory.get_instance(PrinterFactory.matplotlib, b=board_to_solve)
+    printer_ = PrinterFactory.get_instance(PrinterFactory.tkinter, b=board_to_solve)
+    if isinstance(printer_, TkinterPrinter):
+        root = printer_.get_root()
+        root.after(1000, SudokuSolver(printer_, board_to_solve).solve)
+        root.mainloop()
 
-    b = SudokuSolver(printer_, board_to_solve).solve(stop_at_first_solution=True)
-    print(b)
+    else:
+        b = SudokuSolver(printer_, board_to_solve).solve(stop_at_first_solution=True)
+        print(b)
 
-    plt.show()
+    # plt.show() # uncomment to keep matplotlib open
