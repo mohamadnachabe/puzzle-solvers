@@ -4,7 +4,7 @@ This project contains a set of puzzle solvers.
 The solvers use a greedy backtracking strategy to solve the puzzles.
 
 ## sudoku-solver
-`Input should be provided as follows:`
+Input should be provided as follows:
 ```
 board_to_solve = [
     ["5", "3", ".", ".", "7", ".", ".", ".", "."],
