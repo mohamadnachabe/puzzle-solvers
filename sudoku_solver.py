@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import ttk
-import time
 
 import matplotlib.pyplot as plt
 
@@ -181,7 +180,7 @@ if __name__ == '__main__':
         [".", ".", ".", "4", "1", "9", ".", ".", "5"],
         [".", ".", ".", ".", "8", ".", ".", "7", "9"]]
 
-    printer_ = PrinterFactory.get_instance(PrinterFactory.tkinter, b=board_to_solve)
+    printer_ = PrinterFactory.get_instance(PrinterFactory.matplotlib, b=board_to_solve)
     if isinstance(printer_, TkinterPrinter):
         root = printer_.get_root()
         root.after(1000, SudokuSolver(printer_, board_to_solve).solve)
