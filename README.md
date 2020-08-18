@@ -1,8 +1,6 @@
 # Description
 This project contains a set of puzzle solvers.
 
-The solvers use a greedy backtracking strategy to solve the puzzles.
-
 ## sudoku-solver
 Input should be provided as follows:
 ```
