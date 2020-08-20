@@ -25,7 +25,7 @@ The following implementations of `Printer` are provided.
 
 ### Matplotlib example:
 
-![](visual_1.gif)
+![](visual_sudoku_solver.gif)
 
 
 ## crossword-solver

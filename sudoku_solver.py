@@ -11,9 +11,14 @@ class SudokuSolver:
         self.board = board
         self.stats = defaultdict(int)
 
+    def __init__(self, board) -> None:
+        from collections import defaultdict
+        self.printer = Printer()
+        self.board = board
+        self.stats = defaultdict(int)
+
     def solve(self, stop_at_first_solution=True) -> bool:
         def helper(board):
-            print('Working')
             for row in range(len(board)):
                 for col in range(len(board[0])):
                     if board[row][col] == '.':
@@ -190,4 +195,4 @@ if __name__ == '__main__':
         b = SudokuSolver(printer_, board_to_solve).solve(stop_at_first_solution=True)
         print(b)
 
-    # plt.show() # uncomment to keep matplotlib open
+        # plt.show() # uncomment to keep matplotlib open
